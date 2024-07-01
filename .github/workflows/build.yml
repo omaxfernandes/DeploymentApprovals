@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2  # Adiciona ação para fazer checkout do repositório
 
       - name: Simulate a Build
         run: echo 'hello world' > output.txt
@@ -24,6 +24,15 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2  # Adiciona ação para fazer checkout do repositório
+
+      - name: Verify Git repository
+        run: |
+          if [ ! -d .git ]; then
+            echo "Error: Not in a Git repository."
+            exit 1
+          fi
+
       - name: Request approval for develop deployment
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
@@ -39,13 +48,4 @@ jobs:
         run: |
           echo "Waiting for approval..."
           ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
-          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
-            sleep 30
-          done
-
-  deploy-develop:
-    needs: approve-develop
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to develop
-        run: echo "Deploying to develop"
+          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.
