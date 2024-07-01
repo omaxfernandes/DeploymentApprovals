@@ -8,44 +8,32 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v2  # Adiciona ação para fazer checkout do repositório
+      - uses: actions/checkout@v2
 
       - name: Simulate a Build
         run: echo 'hello world' > output.txt
-
+      
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.4
-        with:
+        with:          
           name: 'your-artifact-name'
           path: 'output.txt'
+      
+      - name: Check file content
+        run: cat .github/deployment-approval.md
 
-  approve-develop:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2  # Adiciona ação para fazer checkout do repositório
-
-      - name: Verify Git repository
+      - name: Print environment variables
         run: |
-          if [ ! -d .git ]; then
-            echo "Error: Not in a Git repository."
-            exit 1
-          fi
-
-      - name: Request approval for develop deployment
+          echo ENVIRONMENT=${{ env.ENVIRONMENT }}
+          echo RUNNUMBER=${{ github.run_number }}
+      
+      - name: Create an issue
+        uses: JasonEtco/create-an-issue@v2.6.0
         env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          echo "Requesting approval for develop deployment..."
-          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
-          gh issue comment $ISSUE_NUMBER -b "Deployment Approval requested for develop. Comment 'Approved' to proceed with deployment."
-          echo "Approval requested."
-
-      - name: Wait for approval
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          echo "Waiting for approval..."
-          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
-          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use o PAT_TOKEN aqui
+          ENVIRONMENT: Dev
+          RUNNUMBER: ${{ github.run_number }}
+        with:         
+          filename: .github/deployment-approval.md
