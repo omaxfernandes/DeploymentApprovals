@@ -34,6 +34,8 @@ jobs:
         with:
           filename: .github/deployment-approval.md
       - name: Wait for approval
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           echo "Waiting for approval..."
           ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
@@ -62,6 +64,8 @@ jobs:
         with:
           filename: .github/deployment-approval.md
       - name: Wait for approval
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           echo "Waiting for approval..."
           ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
@@ -90,6 +94,8 @@ jobs:
         with:
           filename: .github/deployment-approval.md
       - name: Wait for approval
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           echo "Waiting for approval..."
           ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
@@ -118,6 +124,8 @@ jobs:
         with:
           filename: .github/deployment-approval.md
       - name: Wait for approval
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: |
           echo "Waiting for approval..."
           ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
