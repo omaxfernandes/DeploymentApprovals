@@ -14,4 +14,3 @@ Comment "Approved" to kick the deployment off.
     "runNumber":  {{ env.RUNNUMBER }},
     "environment": "{{ env.ENVIRONMENT }}"
 }
-```

@@ -10,8 +10,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+
       - name: Simulate a Build
         run: echo 'hello world' > output.txt
+
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.4
         with:
@@ -22,6 +24,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Request approval for develop deployment
         uses: JasonEtco/create-an-issue@v2.6.0
         env:
@@ -33,7 +36,8 @@ jobs:
       - name: Wait for approval
         run: |
           echo "Waiting for approval..."
-          while [[ "$(gh issue view {{ steps.request-approval.outputs.issue_number }} --json state --jq '.state')" != "closed" ]]; do
+          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
+          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
             sleep 30
           done
 
@@ -48,6 +52,7 @@ jobs:
     needs: deploy-develop
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Request approval for uat deployment
         uses: JasonEtco/create-an-issue@v2.6.0
         env:
@@ -59,7 +64,8 @@ jobs:
       - name: Wait for approval
         run: |
           echo "Waiting for approval..."
-          while [[ "$(gh issue view {{ steps.request-approval.outputs.issue_number }} --json state --jq '.state')" != "closed" ]]; do
+          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
+          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
             sleep 30
           done
 
@@ -74,6 +80,7 @@ jobs:
     needs: deploy-uat
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Request approval for hml deployment
         uses: JasonEtco/create-an-issue@v2.6.0
         env:
@@ -85,7 +92,8 @@ jobs:
       - name: Wait for approval
         run: |
           echo "Waiting for approval..."
-          while [[ "$(gh issue view {{ steps.request-approval.outputs.issue_number }} --json state --jq '.state')" != "closed" ]]; do
+          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
+          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
             sleep 30
           done
 
@@ -100,6 +108,7 @@ jobs:
     needs: deploy-hml
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
       - name: Request approval for prd deployment
         uses: JasonEtco/create-an-issue@v2.6.0
         env:
@@ -111,7 +120,8 @@ jobs:
       - name: Wait for approval
         run: |
           echo "Waiting for approval..."
-          while [[ "$(gh issue view {{ steps.request-approval.outputs.issue_number }} --json state --jq '.state')" != "closed" ]]; do
+          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
+          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
             sleep 30
           done
 
