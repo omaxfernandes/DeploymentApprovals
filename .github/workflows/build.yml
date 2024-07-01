@@ -12,18 +12,26 @@ jobs:
 
       - name: Simulate a Build
         run: echo 'hello world' > output.txt
-        
+      
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v2.2.4
         with:          
           name: 'your-artifact-name'
           path: 'output.txt'
-          
+      
+      - name: Check file content
+        run: cat .github/deployment-approval.md
+
+      - name: Print environment variables
+        run: |
+          echo ENVIRONMENT=${{ env.ENVIRONMENT }}
+          echo RUNNUMBER=${{ github.run_number }}
+      
       - name: Create an issue
         uses: JasonEtco/create-an-issue@v2.6.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use o PAT_TOKEN aqui
           ENVIRONMENT: Dev
-          RUNNUMBER: ${{ github.run_number  }}
+          RUNNUMBER: ${{ github.run_number }}
         with:         
           filename: .github/deployment-approval.md
