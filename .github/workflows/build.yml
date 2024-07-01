@@ -24,15 +24,15 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Request approval for develop deployment
-        uses: JasonEtco/create-an-issue@v2.6.0
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          ENVIRONMENT: develop
-          RUNNUMBER: ${{ github.run_number }}
-        with:
-          filename: .github/deployment-approval.md
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+        run: |
+          echo "Requesting approval for develop deployment..."
+          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
+          gh issue comment $ISSUE_NUMBER -b "Deployment Approval requested for develop. Comment 'Approved' to proceed with deployment."
+          echo "Approval requested."
+
       - name: Wait for approval
         env:
           GH_TOKEN: ${{ secrets.PAT_TOKEN }}
@@ -49,93 +49,3 @@ jobs:
     steps:
       - name: Deploy to develop
         run: echo "Deploying to develop"
-
-  approve-uat:
-    needs: deploy-develop
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Request approval for uat deployment
-        uses: JasonEtco/create-an-issue@v2.6.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          ENVIRONMENT: uat
-          RUNNUMBER: ${{ github.run_number }}
-        with:
-          filename: .github/deployment-approval.md
-      - name: Wait for approval
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          echo "Waiting for approval..."
-          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
-          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
-            sleep 30
-          done
-
-  deploy-uat:
-    needs: approve-uat
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to uat
-        run: echo "Deploying to uat"
-
-  approve-hml:
-    needs: deploy-uat
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Request approval for hml deployment
-        uses: JasonEtco/create-an-issue@v2.6.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          ENVIRONMENT: hml
-          RUNNUMBER: ${{ github.run_number }}
-        with:
-          filename: .github/deployment-approval.md
-      - name: Wait for approval
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          echo "Waiting for approval..."
-          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
-          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
-            sleep 30
-          done
-
-  deploy-hml:
-    needs: approve-hml
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to hml
-        run: echo "Deploying to hml"
-
-  approve-prd:
-    needs: deploy-hml
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Request approval for prd deployment
-        uses: JasonEtco/create-an-issue@v2.6.0
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-          ENVIRONMENT: prd
-          RUNNUMBER: ${{ github.run_number }}
-        with:
-          filename: .github/deployment-approval.md
-      - name: Wait for approval
-        env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: |
-          echo "Waiting for approval..."
-          ISSUE_NUMBER=$(gh issue list --state open --label deployment-requested --json number --jq '.[0].number')
-          while [[ "$(gh issue view $ISSUE_NUMBER --json state --jq '.state')" != "closed" ]]; do
-            sleep 30
-          done
-
-  deploy-prd:
-    needs: approve-prd
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy to prd
-        run: echo "Deploying to prd"
