@@ -32,7 +32,7 @@ jobs:
       - name: Create an issue
         uses: JasonEtco/create-an-issue@v2.6.0
         env:
-          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  # Use o PAT_TOKEN aqui
+          GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}  
           ENVIRONMENT: Dev
           RUNNUMBER: ${{ github.run_number }}
         with:         
